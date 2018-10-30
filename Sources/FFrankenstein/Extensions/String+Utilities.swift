@@ -8,7 +8,8 @@
 import Foundation
 import Files
 
-extension String {
+// FIXME: Remove Error conformance
+extension String: Error {
     init(localizedKey: String) {
         self = NSLocalizedString(localizedKey, comment: "")
     }
@@ -17,7 +18,7 @@ extension String {
         return trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
     }
     
-    func encapsulated() -> String {
+    public func encapsulated() -> String {
         return "\"\(self)\""
     }
     
@@ -47,7 +48,7 @@ extension String {
         return false
     }
     
-    func expandingTildeInPath() -> String {
-        return replacingOccurrences(of: "~/", with: FileSystem().homeFolder.path)
+    public func expandingTildeInPath() -> String {
+        return replacingOccurrences(of: "~/", with: FileSystem().homeFolder.path).encapsulated()
     }
 }

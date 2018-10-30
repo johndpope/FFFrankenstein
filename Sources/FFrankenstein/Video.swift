@@ -20,12 +20,17 @@ public struct Video {
         rawFile = try File(path: path)
         
         let ffprobeOutput = try Command.run(.ffprobe, arguments: [
-            "-i", path, "-print_format",
+            "-i", path.encapsulated(), "-print_format",
             "json", "-show_format",
             "-show_streams", "-show_error"
-        ]).data(using: .utf8)!
+        ])
         
-        metadata = try Metadata(from: ffprobeOutput)
+        guard let dictionary = try JSONSerialization.dictionary(from: ffprobeOutput) else {
+            // FIXME: Use a real error
+            throw "Could not serialize string into JSON dictionary"
+        }
+        
+        metadata = try Metadata(from: dictionary)
     }
     
     /// Duration of the video, in seconds
@@ -115,38 +120,43 @@ public struct Video {
     }
 }
 
-extension Video {
-    struct Resolution: Codable {
-        let width: UInt
-        let height: UInt
+public extension Video {
+    public struct Resolution: Codable {
+        public let width: UInt
+        public let height: UInt
     }
     
-    struct Transcoder {
-        struct Options {
+    public struct Transcoder {
+        public struct Options {
             static let `default` = Options()
         }
         
-        var options = Options.default
-        var timeOut = 30
-        var canTimeOut = true
+        public init() {}
+        
+        public var options = Options.default
+        public var timeOut = 30
+        public var canTimeOut = true
     }
     
-    func transcode(
+    @discardableResult
+    public func transcode(
         to output: Path,
         using transcoder: Transcoder = Transcoder(),
         customOptions: String = "",
         _ progressBlock: ((Double) -> Void)? = nil
     ) -> Video {
+        let _ = output.encapsulated()
         fatalError("unimplemented")
     }
     
-    func captureStillImage(
+    public func captureStillImage(
         to output: Path,
         at seekTime: Double = 0,
         resolution: Resolution? = nil,
         // Integer between 1 and 31
         quality: UInt? = nil
     ) {
+        let _ = output.encapsulated()
         fatalError("unimplemented")
     }
 }

@@ -30,3 +30,13 @@ extension Decodable {
         try self.init(from: data)
     }
 }
+
+extension JSONSerialization {
+    static func dictionary(from string: String) throws -> [String : Any]? {
+        if let data = string.data(using: .utf8) {
+            return try jsonObject(with: data) as? [String : Any]
+        }
+        
+        return nil
+    }
+}

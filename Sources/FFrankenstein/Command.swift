@@ -7,13 +7,13 @@
 
 import Foundation
 
-struct Command {
+public struct Command {
     public enum Error: Swift.Error, LocalizedError {
         case unknownError(stderr: String, statusCode: Int)
         case unknownFileType
         case noSuchFileOrDirectory
         
-        var errorDescription: String? {
+        public var errorDescription: String? {
             switch self {
             case let .unknownError(err, code):
                 return String(localizedKey: "An unknown error with status \(code) occured: \(err)")
@@ -25,14 +25,14 @@ struct Command {
         }
     }
     
-    enum Executable: String {
+    public enum Executable: String {
         case ffprobe = "/usr/local/bin/ffprobe"
         case ffmpeg = "/usr/local/bin/ffmpeg"
         case trash = "/usr/local/bin/trash"
     }
 
     @discardableResult
-    static func run(_ executable: Executable, arguments: [String]) throws -> String {
+    public static func run(_ executable: Executable, arguments: [String]) throws -> String {
         let process = Process()
         process.launchPath = executable.rawValue
         process.arguments = arguments
@@ -40,7 +40,7 @@ struct Command {
     }
 
     @discardableResult
-    static func run(_ executable: Executable, arguments: String) throws -> String {
+    public static func run(_ executable: Executable, arguments: String) throws -> String {
         return try Command.run(executable, arguments: [arguments])
     }
 
