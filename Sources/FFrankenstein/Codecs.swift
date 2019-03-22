@@ -1,62 +1,14 @@
 //
-//  FFrankenstein.swift
+//  Codecs.swift
 //  FFrankenstein
 //
-//  Created by Mark Malstrom on 2/17/19.
+//  Created by Mark Malstrom on 3/21/19.
 //
 
 import Foundation
-import Path
 
-public struct FFrankenstein {
-    private let input: Path
-    private let metadata: String
-    var output: Path? = nil
-    
-    private var runCommands: [String] = []
-    
-    init(_ input: Path) throws {
-        self.input = input
-        self.metadata = try Command.ffprobe(input: input)
-    }
-    
-    // FIXME: How should this handle switching after setting?
-    // Don't want to end up with 12 different codecs appended to the runCommands
-    //
-    // FIXME: if metadata.videoCodec == self.videoCodec, videoCodec should be copy
-    // No need to reencode the same codec
-    var videoCodec: VideoCodec {
-        didSet {
-            runCommands.append("-c:v")
-            runCommands.append(videoCodec.rawValue)
-        }
-    }
-    
-    // FIXME: How should this handle switching after setting?
-    // FIXME: if metadata.audioCodec == self.audioCodec, audioCodec should be copy
-    var audioCodec: AudioCodec {
-        didSet {
-            runCommands.append("-c:a")
-            runCommands.append(audioCodec.rawValue)
-        }
-    }
-    
-    /// - Parameter arguments: These arguments will overwrite any previously set options
-    func run(with arguments: [String]? = nil) throws {
-        guard let output = output else {
-            throw "Must set output path to run."
-        }
-        
-        if let arguments = arguments {
-            try Command.ffmpeg(input: input, arguments: arguments, oputput: output)
-        } else {
-            try Command.ffmpeg(input: input, arguments: runCommands, oputput: output)
-        }
-    }
-}
-
-extension FFrankenstein {
-    public enum VideoCodec: RawRepresentable {
+extension FFFrankenstein {
+    public enum VideoCodec: RawRepresentable, CustomStringConvertible {
         public enum ProResEncoder: String {
             case aw, ks
         }
@@ -117,9 +69,13 @@ extension FFrankenstein {
                 return codec
             }
         }
+        
+        public var description: String {
+            return rawValue
+        }
     }
     
-    public enum AudioCodec: RawRepresentable {
+    public enum AudioCodec: RawRepresentable, CustomStringConvertible {
         /// One is not always faster than the other,
         /// but one or the other may be better suited to a particular system
         public enum AC3Encoder: String {
@@ -133,7 +89,7 @@ extension FFrankenstein {
         
         case ac3(AC3Encoder)
         case aac(useFDK: Bool)
-        case flac, opus, fdk_aac, mp3, vorbis, wav
+        case flac, opus, mp3, vorbis, wav
         case copy
         case other(String)
         
@@ -163,8 +119,6 @@ extension FFrankenstein {
                 return "aac"
             case .opus:
                 return "opus"
-            case .fdk_aac:
-                <#code#>
             case .mp3:
                 <#code#>
             case .vorbis:
@@ -176,6 +130,10 @@ extension FFrankenstein {
             case .other(let codec):
                 return codec
             }
+        }
+        
+        public var description: String {
+            return rawValue
         }
     }
 }
