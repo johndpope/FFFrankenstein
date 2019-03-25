@@ -2,21 +2,12 @@
   "object": {
     "pins": [
       {
-        "package": "Path.swift",
-        "repositoryURL": "https://github.com/mxcl/Path.swift.git",
+        "package": "ShellOut",
+        "repositoryURL": "https://github.com/JohnSundell/ShellOut.git",
         "state": {
           "branch": null,
-          "revision": "e915bc0cfb5bcee9d48adfdb9e8208d07291c0e8",
-          "version": "0.16.0"
-        }
-      },
-      {
-        "package": "SDGCornerstone",
-        "repositoryURL": "https://github.com/SDGGiesbrecht/SDGCornerstone",
-        "state": {
-          "branch": null,
-          "revision": "30da677f4fca124b2a60685f0c993a1f0abf691e",
-          "version": "0.13.0"
+          "revision": "d3d54ce662dfee7fef619330b71d251b8d4869f9",
+          "version": "2.2.0"
         }
       }
     ]

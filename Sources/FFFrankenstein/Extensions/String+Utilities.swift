@@ -1,12 +1,11 @@
 //
 //  String+Utilities.swift
-//  FFrankenstein
+//  FFFrankenstein
 //
 //  Created by Mark Malstrom on 10/29/18.
 //
 
 import Foundation
-import Path
 
 // FIXME: Remove Error conformance
 extension String: Error {

@@ -1,21 +1,14 @@
 //
-//  FFBuilder.swift
-//  FFrankenstein
+//  FFFrankenstein.swift
+//  FFFrankenstein
 //
 //  Created by Mark Malstrom on 3/21/19.
 //
 
 import Foundation
+import ShellOut
 
-func += <K, V> (left: inout [K: V], right: [K: V]) {
-    for (k, v) in right {
-        left[k] = v
-    }
-}
-
-extension String: Error {}
-
-public class FFFrankenstein {
+open class FFFrankenstein {
     private var input = String()
     private var inputOptions = [String: String]()
     private var outputOptions = [String: String]()
@@ -39,7 +32,7 @@ public class FFFrankenstein {
     }
     
     /// Set the video codec
-    public func videoCodec(_ codec: VideoCodec) -> FFFrankenstein {
+    public func videoCodec(_ codec: Codec.CodecName) -> FFFrankenstein {
         return videoCodec("\(codec)")
     }
     
@@ -73,22 +66,16 @@ public class FFFrankenstein {
         return self
     }
     
-    // FIXME: Enforce
-    // Calls to aspect() are ignored when size() has been called with a fixed width and height or a percentage, and also
     /**
      Set the output frame aspect ratio
      
-     **NOTE:** Calls to aspect() are ignored when size() has not been called
+     **NOTE:** Calls to aspect() are ignored when size() has been called with a fixed width and height or a percentage, and also when size() has not been called
      */
-    public func aspect(_ ratio: String) throws -> FFFrankenstein {
-        guard outputOptions["-s:v"] != nil else {
-            // FIXME: Make this a real error.
-            throw """
-            You tried to set the aspect ratio on an instance of FFFrankenstein
-            that didn't have its size set yet.
-            
-            See the documentation for more information about this.
-            """
+    public func aspect(_ ratio: String) -> FFFrankenstein {
+        guard let sizeOpt = outputOptions["-s:v"],
+            sizeOpt.range(of: "%") == nil,
+            sizeOpt.range(of: "?") != nil else {
+            return self
         }
         
         outputOptions["-aspect:v"] = ratio
@@ -98,10 +85,10 @@ public class FFFrankenstein {
     /**
      Set the output frame aspect ratio
      
-     **NOTE:** Calls to aspect() are ignored when size() has not been called
+     **NOTE:** Calls to aspect() are ignored when size() has been called with a fixed width and height or a percentage, and also when size() has not been called
      */
-    public func aspect(_ ratio: Double) throws -> FFFrankenstein {
-        return try aspect("\(ratio)")
+    public func aspect(_ ratio: Double) -> FFFrankenstein {
+        return aspect("\(ratio)")
     }
     
     /// Set the output duration
@@ -128,7 +115,7 @@ public class FFFrankenstein {
     }
     
     /// Set the audio codec
-    public func audioCodec(_ codec: AudioCodec) -> FFFrankenstein {
+    public func audioCodec(_ codec: Codec.CodecName) -> FFFrankenstein {
         return audioCodec("\(codec)")
     }
     
@@ -176,20 +163,80 @@ public class FFFrankenstein {
     }
     
     public func run() throws {
-        try Command.ffmpeg(
+        try shellOut(to: .ffmpeg(
             input: input,
             inputArguments: inputOptions,
             outputArguments: outputOptions,
-            oputput: output
-        )
+            output: output))
     }
     
     public func save(to path: String) throws {
         try output(path).run()
     }
     
+    public func streams() throws -> [Stream] {
+        guard !input.isEmpty else {
+            throw "Cannot access streams before setting an input."
+        }
+        
+        let rawString = try shellOut(to: .ffprobe(input: input))
+        
+        guard let data = rawString.data(using: .utf8) else {
+            throw "ffprobe data could not be synthesized."
+        }
+        
+        return try FFProbeOutput(from: data).streams
+    }
+    
+    /// - Returns: The first stream with the codec type passed in
+    public func stream(for codecType: Codec.CodecType) throws -> Stream {
+        let strms = try streams()
+        for stream in strms where stream.codec.type == codecType {
+            return stream
+        }
+        
+        throw "Could not find a stream with a \(codecType) codec type."
+    }
+    
+    public func formatMetadata() throws -> Format {
+        guard !input.isEmpty else {
+            throw "Cannot access format metadata before setting an input."
+        }
+        
+        let rawString = try shellOut(to: .ffprobe(input: input))
+        
+        guard let data = rawString.data(using: .utf8) else {
+            throw "ffprobe data could not be synthesized."
+        }
+        
+        return try FFProbeOutput(from: data).format
+    }
+    
+    /**
+     Copy an FFFrankenstein instance.
+     
+     This method is useful when you want to process the same input multiple times.
+     It returns a new FFFrankenstein instance with the exact same options.
+     
+     All options set *after* the `copy()` call will only be applied to the instance
+     it has been called on.
+     */
+    public func copy() -> FFFrankenstein {
+        let copy = FFFrankenstein()
+        copy.input = self.input
+        copy.inputOptions = self.inputOptions
+        copy.outputOptions = self.outputOptions
+        copy.output = self.output
+        return copy
+    }
+    
     // TODO: EventEmitter-like observables
     // https://github.com/fluent-ffmpeg/node-fluent-ffmpeg#setting-event-handlers
+    // https://www.swiftbysundell.com/posts/observers-in-swift-part-1
+    // https://www.swiftbysundell.com/posts/observers-in-swift-part-2
+    
+    // TODO: Add a progress callback
+    // https://github.com/kkroening/ffmpeg-python/issues/43
     
     // TODO: Concatenate multiple inputs
     // https://github.com/fluent-ffmpeg/node-fluent-ffmpeg#mergetofilefilename-tmpdir-concatenate-multiple-inputs
@@ -200,12 +247,6 @@ public class FFFrankenstein {
     // TODO: Kill the currently running ffmpeg process
     // https://github.com/fluent-ffmpeg/node-fluent-ffmpeg#killsignalsigkill-kill-any-running-ffmpeg-process
     
-    // TODO: ffprobe methods
-    // https://github.com/fluent-ffmpeg/node-fluent-ffmpeg#reading-video-metadata
-    
     // TODO: Querying ffmpeg capabilities
     // https://github.com/fluent-ffmpeg/node-fluent-ffmpeg#querying-ffmpeg-capabilities
-    
-    // TODO: Cloning
-    // https://github.com/fluent-ffmpeg/node-fluent-ffmpeg#cloning-an-ffmpegcommand
 }

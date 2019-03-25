@@ -4,14 +4,14 @@
 import PackageDescription
 
 let package = Package(
-    name: "FFrankenstein",
+    name: "FFFrankenstein",
     products: [
-        .library(name: "FFrankenstein", targets: ["FFrankenstein"])
+        .library(name: "FFFrankenstein", targets: ["FFFrankenstein"])
     ],
     dependencies: [
-        .package(url: "https://github.com/SDGGiesbrecht/SDGCornerstone", from: "0.13.0")
+        .package(url: "https://github.com/JohnSundell/ShellOut.git", from: "2.2.0")
     ],
     targets: [
-        .target(name: "FFrankenstein", dependencies: ["SDGExternalProcess"]),
+        .target(name: "FFFrankenstein", dependencies: ["ShellOut"]),
     ]
 )
