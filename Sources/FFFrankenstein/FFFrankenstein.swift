@@ -14,6 +14,8 @@ open class FFFrankenstein {
     private var outputOptions = [String: String]()
     private var output = String()
     
+    public init() {}
+    
     public func inputOptions(_ opts: [String: String]) -> FFFrankenstein {
         inputOptions += opts
         return self
