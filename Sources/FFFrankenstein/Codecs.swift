@@ -9,8 +9,8 @@ import Foundation
 
 extension FFFrankenstein {
     public struct Codec {
-        let type: CodecType
-        let name: CodecName
+        public let type: CodecType
+        public let name: CodecName
     }
 }
 
