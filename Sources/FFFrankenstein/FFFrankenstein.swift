@@ -16,53 +16,62 @@ open class FFFrankenstein {
     
     public init() {}
     
+    @discardableResult
     public func inputOptions(_ opts: [String: String]) -> FFFrankenstein {
         inputOptions += opts
         return self
     }
     
     /// Set the input file
+    @discardableResult
     public func input(_ path: String) -> FFFrankenstein {
         input = path
         return self
     }
     
     /// Set the video codec
+    @discardableResult
     public func videoCodec(_ codec: String) -> FFFrankenstein {
         outputOptions["-c:v"] = codec
         return self
     }
     
     /// Set the video codec
+    @discardableResult
     public func videoCodec(_ codec: Codec.CodecName) -> FFFrankenstein {
         return videoCodec("\(codec)")
     }
     
     /// Disable video altogether
+    @discardableResult
     public func noVideo() -> FFFrankenstein {
         outputOptions["-vn"] = ""
         return self
     }
     
     /// Set the video bitrate
+    @discardableResult
     public func videoBitrate(_ bitrate: UInt) -> FFFrankenstein {
         outputOptions["-b:v"] = "\(bitrate)"
         return self
     }
     
     /// Set the output framerate
+    @discardableResult
     public func fps(_ frameRate: Double) -> FFFrankenstein {
         outputOptions["-r:v"] = "\(frameRate)"
         return self
     }
     
     /// Set the number of video frames to output
+    @discardableResult
     public func frames(_ count: UInt) -> FFFrankenstein {
         outputOptions["-frames:v"] = "\(count)"
         return self
     }
     
     /// Set the output frame size
+    @discardableResult
     public func size(_ size: String) -> FFFrankenstein {
         outputOptions["-s:v"] = size
         return self
@@ -73,6 +82,7 @@ open class FFFrankenstein {
      
      **NOTE:** Calls to aspect() are ignored when size() has been called with a fixed width and height or a percentage, and also when size() has not been called
      */
+    @discardableResult
     public func aspect(_ ratio: String) -> FFFrankenstein {
         guard let sizeOpt = outputOptions["-s:v"],
             sizeOpt.range(of: "%") == nil,
@@ -89,68 +99,80 @@ open class FFFrankenstein {
      
      **NOTE:** Calls to aspect() are ignored when size() has been called with a fixed width and height or a percentage, and also when size() has not been called
      */
+    @discardableResult
     public func aspect(_ ratio: Double) -> FFFrankenstein {
         return aspect("\(ratio)")
     }
     
     /// Set the output duration
+    @discardableResult
     public func duration(_ time: String) -> FFFrankenstein {
         outputOptions["-t"] = time
         return self
     }
     
     /// Set the output duration
+    @discardableResult
     public func duration(_ time: Double) -> FFFrankenstein {
         return duration("\(time)")
     }
     
     /// Set the output format
+    @discardableResult
     public func format(_ format: String) -> FFFrankenstein {
         outputOptions["-f"] = format
         return self
     }
     
     /// Set the audio codec
+    @discardableResult
     public func audioCodec(_ codec: String) -> FFFrankenstein {
         outputOptions["-c:a"] = codec
         return self
     }
     
     /// Set the audio codec
+    @discardableResult
     public func audioCodec(_ codec: Codec.CodecName) -> FFFrankenstein {
         return audioCodec("\(codec)")
     }
     
     /// Disable audio altogether
+    @discardableResult
     public func noAudio() -> FFFrankenstein {
         outputOptions["-an"] = ""
         return self
     }
     
     /// Set the audio bitrate
+    @discardableResult
     public func audioBitrate(_ bitrate: UInt) -> FFFrankenstein {
         outputOptions["-b:a"] = "\(bitrate)"
         return self
     }
     
     /// Set the audio channel count
+    @discardableResult
     public func audioChannels(_ count: UInt) -> FFFrankenstein {
         outputOptions["-ac"] = "\(count)"
         return self
     }
     
     /// Set the audio frequency in Hz
+    @discardableResult
     public func audioFrequency(_ freq: UInt) -> FFFrankenstein {
         outputOptions["-ar"] = "\(freq)"
         return self
     }
     
     /// Set the audio frequency in Hz
+    @discardableResult
     public func audioQuality(_ quality: UInt) -> FFFrankenstein {
         outputOptions["-q:a"] = "\(quality)"
         return self
     }
     
+    @discardableResult
     public func outputOptions(_ opts: [String: String]) -> FFFrankenstein {
         outputOptions += opts
         return self
@@ -159,6 +181,7 @@ open class FFFrankenstein {
     /// Set the path for the output file
     ///
     /// NOTE: Must be called after all other options are set to work properly
+    @discardableResult
     public func output(_ path: String) -> FFFrankenstein {
         output = path
         return self
